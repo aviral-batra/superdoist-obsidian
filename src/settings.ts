@@ -2,11 +2,13 @@ import { App, PluginSettingTab, Setting } from "obsidian";
 import SuperDoist from "./main";
 
 export interface SuperDoistSettings {
-	mySetting: string;
+	rootProjectDir: string;
+	todoistAuth: string;
 }
 
 export const DEFAULT_SETTINGS: SuperDoistSettings = {
-	mySetting: 'default'
+	rootProjectDir: 'Projects',
+	todoistAuth: "",
 }
 
 export class SuperDoistSettingsTab extends PluginSettingTab {
@@ -23,17 +25,25 @@ export class SuperDoistSettingsTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl('h2', {text: 'Settings for my awesome plugin.'});
+		containerEl.createEl('h2', {text: 'Settings for SuperDoist'});
 
 		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
+			.setName('Root project directory')
+			.setDesc('Directory under which the plugin will start looking for projects and todoist tasks')
 			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
+				.setPlaceholder('e.g. Projects')
+				.setValue(this.plugin.settings.rootProjectDir)
 				.onChange(async (value) => {
-					console.log('Secret: ' + value);
-					this.plugin.settings.mySetting = value;
+					this.plugin.settings.rootProjectDir = value;
+					await this.plugin.saveSettings();
+				}));
+		
+		new Setting(containerEl)
+			.setName('Todoist authorisation token')
+			.addText(text => text
+				.setValue(this.plugin.settings.todoistAuth)
+				.onChange(async (value) => {
+					this.plugin.settings.todoistAuth = value;
 					await this.plugin.saveSettings();
 				}));
 	}
